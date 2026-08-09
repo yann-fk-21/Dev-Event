@@ -47,19 +47,21 @@ BookingSchema.index({ eventId: 1 });
 /**
  * Pre-save hook to verify that the referenced Event exists before saving a booking.
  */
-BookingSchema.pre<IBooking>('save', async function (next) {
+BookingSchema.pre<IBooking>('save', async function () {
   // Only check if eventId is being set or modified
   if (this.isModified('eventId')) {
     try {
       const eventExists = await Event.exists({ _id: this.eventId });
       if (!eventExists) {
-        return next(new Error('Referenced Event does not exist. Validation failed.'));
+        throw new Error('Referenced Event does not exist. Validation failed.');
       }
     } catch (error) {
-      return next(new Error('Error validating Event existence.'));
+      if (error instanceof Error && error.message.includes('Referenced Event')) {
+        throw error;
+      }
+      throw new Error('Error validating Event existence.');
     }
   }
-  next();
 });
 
 /**
