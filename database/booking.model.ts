@@ -6,6 +6,7 @@ import Event from './event.model';
  */
 export interface IBooking extends Document {
   eventId: Types.ObjectId;
+  slug: string;
   email: string;
   createdAt: Date;
   updatedAt: Date;
@@ -20,6 +21,11 @@ const BookingSchema: Schema<IBooking> = new Schema(
       type: Schema.Types.ObjectId, 
       ref: 'Event', 
       required: true 
+    },
+    slug: {
+      type: String,
+      required: true,
+      trim: true,
     },
     email: {
       type: String,
@@ -43,6 +49,8 @@ const BookingSchema: Schema<IBooking> = new Schema(
  * Index on eventId for faster queries and optimized joins/lookups.
  */
 BookingSchema.index({ eventId: 1 });
+BookingSchema.index({ eventId: 1, email: 1 }, { unique: true });
+BookingSchema.index({ slug: 1 });
 
 /**
  * Pre-save hook to verify that the referenced Event exists before saving a booking.

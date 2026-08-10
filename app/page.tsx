@@ -16,12 +16,12 @@ const Page = async () => {
             <p className="text-center mt-5">Hackathons, Meetups, and Conferences, All in One.</p>
           <ExploreBtn/>
 
-            <div className="mt-20 space-y-7">
+            <div id="#events" className="mt-20 space-y-7">
                 <h3>Featured Events</h3>
 
                 <ul className="events list-none">
                     {events && events.length >0 && events.map((event: IEvent) => (
-                        <li key={event.title}>
+                        <li key={event.slug}>
                             <EventCard {...event} />
                         </li>
                     ))}
