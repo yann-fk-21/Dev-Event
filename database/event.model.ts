@@ -55,7 +55,7 @@ EventSchema.index({ slug: 1 });
 /**
  * Pre-save hook to handle slug generation and data normalization.
  */
-EventSchema.pre<IEvent>('save', function (next) {
+EventSchema.pre<IEvent>('save', async function () {
   // Automatically generate/update slug if title is modified
   if (this.isModified('title')) {
     this.slug = this.title
@@ -70,7 +70,7 @@ EventSchema.pre<IEvent>('save', function (next) {
   if (this.isModified('date')) {
     const parsedDate = new Date(this.date);
     if (isNaN(parsedDate.getTime())) {
-      return next(new Error('Invalid date provided.'));
+      throw new Error('Invalid date provided.');
     }
     this.date = parsedDate.toISOString();
   }
@@ -79,8 +79,6 @@ EventSchema.pre<IEvent>('save', function (next) {
   if (this.isModified('time')) {
     this.time = this.time.trim();
   }
-
-  next();
 });
 
 /**
