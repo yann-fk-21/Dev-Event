@@ -1,8 +1,5 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
-/**
- * Interface representing an Event document in MongoDB.
- */
 export interface IEvent extends Document {
   title: string;
   slug: string;
@@ -22,9 +19,6 @@ export interface IEvent extends Document {
   updatedAt: Date;
 }
 
-/**
- * Mongoose schema for the Event model.
- */
 const EventSchema: Schema<IEvent> = new Schema(
   {
     title: { type: String, required: true, trim: true },
@@ -44,29 +38,20 @@ const EventSchema: Schema<IEvent> = new Schema(
   },
   {
     timestamps: true, // Automatically manages createdAt and updatedAt fields
-  }
+  },
 );
 
-/**
- * Unique index on slug for optimized lookups and data integrity.
- */
 EventSchema.index({ slug: 1 });
 
-/**
- * Pre-save hook to handle slug generation and data normalization.
- */
 EventSchema.pre<IEvent>('save', async function () {
-  // Automatically generate/update slug if title is modified
   if (this.isModified('title')) {
     this.slug = this.title
       .toLowerCase()
       .trim()
-      .replace(/[^\w\s-]/g, '') // Remove non-word characters (except space and hyphen)
-      .replace(/[\s_-]+/g, '-') // Replace spaces, underscores and hyphens with a single hyphen
-      .replace(/^-+|-+$/g, ''); // Remove leading and trailing hyphens
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-');
   }
 
-  // Validate and normalize date to ISO format
   if (this.isModified('date')) {
     const parsedDate = new Date(this.date);
     if (isNaN(parsedDate.getTime())) {
@@ -75,15 +60,12 @@ EventSchema.pre<IEvent>('save', async function () {
     this.date = parsedDate.toISOString();
   }
 
-  // Ensure time is stored in a consistent, trimmed format
   if (this.isModified('time')) {
     this.time = this.time.trim();
   }
 });
 
-/**
- * Export the Event model. Uses existing model if available to prevent re-compilation in Next.js.
- */
-const Event: Model<IEvent> = mongoose.models.Event || mongoose.model<IEvent>('Event', EventSchema);
+const Event: Model<IEvent> =
+  mongoose.models.Event || mongoose.model<IEvent>('Event', EventSchema);
 
 export default Event;

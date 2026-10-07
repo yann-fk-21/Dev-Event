@@ -1,38 +1,38 @@
-import React from 'react'
-import ExploreBtn from "@/components/ExploreBtn";
-import EventCard from "@/components/EventCard";
-import {IEvent} from "@/database/event.model";
-// import {events} from "@/lib/constants"
-import {cacheLife} from "next/cache";
+import React from 'react';
+import ExploreBtn from '@/components/ExploreBtn';
+import EventCard from '@/components/EventCard';
+import { IEvent } from '@/database/event.model';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
 const Page = async () => {
+  const response = await fetch(`${BASE_URL}/api/events`);
+  const { events } = await response.json();
 
-    "use cache";
-    cacheLife('hours');
+  return (
+    <section>
+      <h1 className="text-center">
+        The Hub for Every Dev <br /> Event You Cannot Miss
+      </h1>
+      <p className="text-center mt-5">
+        Hackathons, Meetups, and Conferences, All in One.
+      </p>
+      <ExploreBtn />
 
-    const response  = await fetch(`${BASE_URL}/api/events`);
-    const {events} = await response.json();
+      <div id="#events" className="mt-20 space-y-7">
+        <h3>Featured Events</h3>
 
-    return (
-        <section>
-          <h1 className="text-center">The Hub for Every Dev <br/> Event Can't Miss</h1>
-            <p className="text-center mt-5">Hackathons, Meetups, and Conferences, All in One.</p>
-          <ExploreBtn/>
-
-            <div id="#events" className="mt-20 space-y-7">
-                <h3>Featured Events</h3>
-
-                <ul className="events list-none">
-                    {events && events.length >0 && events.map((event: IEvent) => (
-                        <li key={event.slug}>
-                            <EventCard {...event} />
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </section>
-    )
-}
-export default Page
+        <ul className="events list-none">
+          {events &&
+            events.length > 0 &&
+            events.map((event: IEvent) => (
+              <li key={event.slug}>
+                <EventCard {...event} />
+              </li>
+            ))}
+        </ul>
+      </div>
+    </section>
+  );
+};
+export default Page;
